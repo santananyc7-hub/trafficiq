@@ -26,17 +26,17 @@
   --ink-muted: 82 91 110;
   --ink-subtle: 128 137 156;
 
-  /* Brand — indigo intelligence (#4f46e5 family) */
-  --brand-50: 238 240 255;
-  --brand-100: 224 228 255;
-  --brand-200: 199 205 254;
-  --brand-300: 165 173 251;
-  --brand-400: 129 135 246;
-  --brand-500: 99 102 241;
-  --brand-600: 79 70 229;
-  --brand-700: 67 56 202;
-  --brand-800: 55 48 163;
-  --brand-900: 39 35 116;
+  /* Brand — TrafficIQ blue (Revenue Labs, #2563eb family) */
+  --brand-50: 239 246 255;
+  --brand-100: 219 234 254;
+  --brand-200: 191 219 254;
+  --brand-300: 147 197 253;
+  --brand-400: 96 165 250;
+  --brand-500: 59 130 246;
+  --brand-600: 37 99 235;
+  --brand-700: 29 78 216;
+  --brand-800: 30 64 175;
+  --brand-900: 30 58 138;
 
   /* Signal — the ownable TrafficIQ accent: electric cyan-lime "detection" */
   --signal: 45 212 191; /* teal-cyan, used sparingly for the live signal */
@@ -74,18 +74,18 @@
   --ink-muted: 158 167 187;
   --ink-subtle: 116 125 147;
 
-  /* Indigo tuned for the dark canvas: brand-600 grounds white-text buttons,
+  /* Blue tuned for the dark canvas: brand-600 grounds white-text buttons,
      brand-50 is a dark tint, brand-700+ light tints for chips/accents. */
-  --brand-50: 30 30 74;
-  --brand-100: 38 40 96;
-  --brand-200: 52 54 140;
-  --brand-300: 88 92 200;
-  --brand-400: 120 124 240;
-  --brand-500: 129 135 246;
-  --brand-600: 99 102 241;
-  --brand-700: 165 173 251;
-  --brand-800: 199 205 254;
-  --brand-900: 224 228 255;
+  --brand-50: 23 44 96;
+  --brand-100: 30 58 138;
+  --brand-200: 30 71 168;
+  --brand-300: 40 100 214;
+  --brand-400: 59 130 246;
+  --brand-500: 96 165 250;
+  --brand-600: 37 99 235;
+  --brand-700: 147 197 253;
+  --brand-800: 191 219 254;
+  --brand-900: 219 234 254;
 
   --signal: 45 212 191;
   --signal-strong: 94 234 212;
