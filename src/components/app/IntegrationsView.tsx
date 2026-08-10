@@ -24,6 +24,12 @@ const CONNECTED: Connected[] = [
     lastSync: "4 minutes ago",
   },
   {
+    name: "VeriScan",
+    category: "Door traffic & ID scan",
+    provides: ["Door scans", "Store visits", "New vs returning", "Age verification"],
+    lastSync: "2 minutes ago",
+  },
+  {
     name: "Alpine IQ",
     category: "CRM & loyalty",
     provides: ["Customer segments", "Campaigns", "Loyalty"],
