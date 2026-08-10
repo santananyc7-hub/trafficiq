@@ -1,0 +1,286 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * TrafficIQ theme tokens — the single source of truth shared by the marketing
+ * site and the product (§34). Dark is the signature surface for hero / demo
+ * moments; light is the default working canvas. Colors are raw "R G B" triplets
+ * so Tailwind's <alpha-value> works everywhere.
+ */
+:root {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Surfaces — cool slate neutrals */
+  --canvas: 247 248 251; /* app / page background */
+  --surface: 255 255 255; /* cards */
+  --surface-2: 241 243 248; /* insets / table headers */
+  --surface-3: 233 236 243; /* deeper insets */
+  --overlay: 255 255 255;
+  --border: 224 227 235;
+  --border-strong: 202 207 219;
+
+  /* Text — graphite */
+  --ink: 15 20 32; /* near-black slate */
+  --ink-muted: 82 91 110;
+  --ink-subtle: 128 137 156;
+
+  /* Brand — indigo intelligence (#4f46e5 family) */
+  --brand-50: 238 240 255;
+  --brand-100: 224 228 255;
+  --brand-200: 199 205 254;
+  --brand-300: 165 173 251;
+  --brand-400: 129 135 246;
+  --brand-500: 99 102 241;
+  --brand-600: 79 70 229;
+  --brand-700: 67 56 202;
+  --brand-800: 55 48 163;
+  --brand-900: 39 35 116;
+
+  /* Signal — the ownable TrafficIQ accent: electric cyan-lime "detection" */
+  --signal: 45 212 191; /* teal-cyan, used sparingly for the live signal */
+  --signal-strong: 20 184 166;
+
+  /* Money / revenue (emerald) */
+  --money-soft: 219 250 233;
+  --money: 16 163 96;
+  --money-strong: 12 130 78;
+
+  /* Opportunity — signature amber/gold "grow here" */
+  --opp-soft: 254 243 214;
+  --opp: 217 152 15;
+  --opp-strong: 176 118 8;
+
+  /* Directional semantics */
+  --pos: 16 163 96;
+  --neg: 220 55 55;
+  --warn: 202 138 4;
+  --info: 100 116 139;
+
+  --shadow: 15 20 32;
+}
+
+.dark {
+  --canvas: 8 10 18; /* near-black slate */
+  --surface: 15 18 30;
+  --surface-2: 22 26 42;
+  --surface-3: 30 35 54;
+  --overlay: 18 22 36;
+  --border: 33 38 58;
+  --border-strong: 48 55 80;
+
+  --ink: 233 236 244;
+  --ink-muted: 158 167 187;
+  --ink-subtle: 116 125 147;
+
+  /* Indigo tuned for the dark canvas: brand-600 grounds white-text buttons,
+     brand-50 is a dark tint, brand-700+ light tints for chips/accents. */
+  --brand-50: 30 30 74;
+  --brand-100: 38 40 96;
+  --brand-200: 52 54 140;
+  --brand-300: 88 92 200;
+  --brand-400: 120 124 240;
+  --brand-500: 129 135 246;
+  --brand-600: 99 102 241;
+  --brand-700: 165 173 251;
+  --brand-800: 199 205 254;
+  --brand-900: 224 228 255;
+
+  --signal: 45 212 191;
+  --signal-strong: 94 234 212;
+
+  --money-soft: 15 51 36;
+  --money: 52 211 153;
+  --money-strong: 110 231 183;
+
+  --opp-soft: 60 44 10;
+  --opp: 245 190 74;
+  --opp-strong: 250 210 120;
+
+  --pos: 52 211 153;
+  --neg: 248 113 113;
+  --warn: 250 204 21;
+  --info: 148 163 184;
+
+  --shadow: 0 0 0;
+}
+
+* {
+  border-color: rgb(var(--border));
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: rgb(var(--canvas));
+  color: rgb(var(--ink));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv11", "ss01";
+  /* Clip decorative bleed (blur glows, ambient fields) without creating a
+     scroll container — `clip` keeps position:sticky working, unlike `hidden`. */
+  overflow-x: clip;
+}
+
+/* Respect users who prefer reduced motion: neutralize CSS animation/transition.
+   (SVG SMIL loops in the hero/map are ambient and paused separately via the
+   reduced-motion guard on their wrappers.) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Tabular alignment for financial figures */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Fine tracking for the wordmark / eyebrows */
+.tracking-brand {
+  letter-spacing: -0.02em;
+}
+
+/* Thin, refined scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-strong));
+  border-radius: 999px;
+  border: 3px solid rgb(var(--canvas));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--ink-subtle));
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid rgb(var(--brand-500));
+  outline-offset: 2px;
+}
+
+@layer components {
+  .field {
+    width: 100%;
+    height: 2.75rem;
+    border-radius: 0.625rem;
+    border: 1px solid rgb(var(--border));
+    background-color: rgb(var(--surface-2));
+    padding: 0 0.875rem;
+    font-size: 0.875rem;
+    color: rgb(var(--ink));
+    transition: border-color 0.15s, background-color 0.15s;
+  }
+  .field::placeholder {
+    color: rgb(var(--ink-subtle));
+  }
+  .field:focus {
+    outline: none;
+    border-color: rgb(var(--brand-400));
+    background-color: rgb(var(--surface));
+  }
+
+  /* Range slider used by the ROI calculator */
+  .tiq-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+  }
+  .tiq-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 18px;
+    width: 18px;
+    border-radius: 999px;
+    background: rgb(var(--surface));
+    border: 2px solid rgb(var(--brand-600));
+    box-shadow: 0 1px 3px rgb(var(--shadow) / 0.25);
+    transition: transform 0.12s;
+  }
+  .tiq-range::-webkit-slider-thumb:hover {
+    transform: scale(1.12);
+  }
+  .tiq-range::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 999px;
+    background: rgb(var(--surface));
+    border: 2px solid rgb(var(--brand-600));
+  }
+}
+
+@layer utilities {
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: rgb(var(--surface-2));
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--border) / 0.6),
+      transparent
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* The TrafficIQ dot-grid — the graphic-language backdrop for dark sections */
+  .grid-signal {
+    background-image: radial-gradient(
+      rgb(var(--ink) / 0.05) 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+  }
+  .dark .grid-signal {
+    background-image: radial-gradient(
+      rgb(255 255 255 / 0.045) 1px,
+      transparent 1px
+    );
+  }
+
+  /* Fine coordinate grid (lines) for map / trade-area surfaces */
+  .grid-coords {
+    background-image: linear-gradient(rgb(var(--border) / 0.6) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--border) / 0.6) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent);
+    mask-image: linear-gradient(to bottom, black 70%, transparent);
+  }
+}
+
+@keyframes tiq-breath {
+  0%, 100% { transform: scale(1.03); }
+  50% { transform: scale(1.09); }
+}
