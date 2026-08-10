@@ -38,7 +38,7 @@ export function MarketingNav() {
     >
       <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center gap-6 px-5 sm:px-8">
         <Link href="/" aria-label="TrafficIQ home">
-          <Logo size="sm" />
+          <Logo size="sm" endorsed />
         </Link>
 
         <nav className="ml-2 hidden items-center gap-1 lg:flex">

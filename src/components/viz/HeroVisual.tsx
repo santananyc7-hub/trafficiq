@@ -1,5 +1,8 @@
-import Image from "next/image";
 import { cn } from "@/lib/cn";
+
+// Pages basePath (empty in dev) so the render resolves under /<repo>/ too.
+const HERO_SRC =
+  (process.env.NEXT_PUBLIC_BASE_PATH || "") + "/hero/signal-field.png";
 
 /**
  * Hero visual (§10) — a cinematic "signal from movement" panel.
@@ -23,13 +26,12 @@ export function HeroVisual({ className }: { className?: string }) {
         className="absolute inset-0 origin-center"
         style={{ animation: "tiq-breath 18s ease-in-out infinite" }}
       >
-        <Image
-          src="/hero/signal-field.png"
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={HERO_SRC}
           alt="An aerial city rendered as a network of light — acquisition signals converging from many directions onto one bright node."
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 560px"
-          className="object-cover"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
 

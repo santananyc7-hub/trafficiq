@@ -41,7 +41,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex h-full flex-col bg-surface">
       <div className="flex h-16 items-center px-5">
         <Link href="/overview" onClick={onNavigate} aria-label="TrafficIQ">
-          <Logo size="sm" />
+          <Logo size="sm" endorsed />
         </Link>
       </div>
 

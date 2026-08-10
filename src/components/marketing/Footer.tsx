@@ -28,7 +28,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-[1.4fr_2fr]">
           {/* Brand */}
           <div>
-            <Logo size="sm" />
+            <Logo size="sm" endorsed />
             <p className="mt-4 max-w-xs text-[14px] leading-relaxed text-ink-muted">
               Customer Acquisition Intelligence for retail.
             </p>
