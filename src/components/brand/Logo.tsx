@@ -6,7 +6,9 @@ import { cn } from "@/lib/cn";
  * so it reads on both light and dark surfaces.
  */
 
-const ICON = "/brand/tiq-icon.png";
+// Prefix the Pages basePath (empty in dev) so the plain <img> resolves under
+// https://<user>.github.io/<repo>/ as well as at the root during local dev.
+const ICON = (process.env.NEXT_PUBLIC_BASE_PATH || "") + "/brand/tiq-icon.png";
 
 /** The icon tile at an arbitrary size. `variant` kept for call-site compatibility. */
 export function LogoSymbol({
