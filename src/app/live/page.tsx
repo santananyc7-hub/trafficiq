@@ -1,5 +1,6 @@
 import { getSnapshot } from "@/server/snapshot";
 import CaptureMap from "./CaptureMap";
+import Actions from "./Actions";
 import origins from "../../../data/geo/zip-origins.json";
 
 /* Command Center — the real product. Server component: reads the latest
@@ -90,6 +91,8 @@ export default async function LivePage() {
           Real: active, repeat rate, LTV, penetration, channel. Modeled: capture conversion (5%) and reactivation win-back rates.
         </p>
       </section>
+
+      <Actions active={d.active} repeatRate={d.repeatRate} realLTV={d.realLTV} avgTxns={d.avgTxns} segments={d.segments} rows={d.rows} />
 
       <section className="mt-8">
         <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Channels — where orders come from</h2>

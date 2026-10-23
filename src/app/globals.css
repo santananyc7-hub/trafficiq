@@ -26,21 +26,22 @@
   --ink-muted: 82 91 110;
   --ink-subtle: 128 137 156;
 
-  /* Brand — TrafficIQ blue (Revenue Labs, #2563eb family) */
-  --brand-50: 239 246 255;
-  --brand-100: 219 234 254;
-  --brand-200: 191 219 254;
-  --brand-300: 147 197 253;
-  --brand-400: 96 165 250;
-  --brand-500: 59 130 246;
-  --brand-600: 37 99 235;
-  --brand-700: 29 78 216;
-  --brand-800: 30 64 175;
-  --brand-900: 30 58 138;
+  /* Brand — quantum violet (#7c3aed family) */
+  --brand-50: 245 243 255;
+  --brand-100: 237 233 254;
+  --brand-200: 221 214 254;
+  --brand-300: 196 181 253;
+  --brand-400: 167 139 250;
+  --brand-500: 139 92 246;
+  --brand-600: 124 58 237;
+  --brand-700: 109 40 217;
+  --brand-800: 91 33 182;
+  --brand-900: 76 29 149;
 
-  /* Signal — the ownable TrafficIQ accent: electric cyan-lime "detection" */
-  --signal: 45 212 191; /* teal-cyan, used sparingly for the live signal */
-  --signal-strong: 20 184 166;
+  /* Signal — electric cyan; paired with magenta for the quantum flows */
+  --signal: 34 211 238; /* cyan #22d3ee */
+  --signal-strong: 6 182 212;
+  --flux: 232 121 249; /* magenta #e879f9 — high-density customer flow */
 
   /* Money / revenue (emerald) */
   --money-soft: 219 250 233;
@@ -62,33 +63,34 @@
 }
 
 .dark {
-  --canvas: 8 10 18; /* near-black slate */
-  --surface: 15 18 30;
-  --surface-2: 22 26 42;
-  --surface-3: 30 35 54;
-  --overlay: 18 22 36;
-  --border: 33 38 58;
-  --border-strong: 48 55 80;
+  --canvas: 6 7 16; /* deep space, violet bias */
+  --surface: 13 14 28;
+  --surface-2: 20 21 40;
+  --surface-3: 29 30 54;
+  --overlay: 17 18 36;
+  --border: 36 36 64;
+  --border-strong: 54 54 90;
 
   --ink: 233 236 244;
   --ink-muted: 158 167 187;
   --ink-subtle: 116 125 147;
 
-  /* Blue tuned for the dark canvas: brand-600 grounds white-text buttons,
+  /* Violet tuned for the dark canvas: brand-600 grounds white-text buttons,
      brand-50 is a dark tint, brand-700+ light tints for chips/accents. */
-  --brand-50: 23 44 96;
-  --brand-100: 30 58 138;
-  --brand-200: 30 71 168;
-  --brand-300: 40 100 214;
-  --brand-400: 59 130 246;
-  --brand-500: 96 165 250;
-  --brand-600: 37 99 235;
-  --brand-700: 147 197 253;
-  --brand-800: 191 219 254;
-  --brand-900: 219 234 254;
+  --brand-50: 46 16 101;
+  --brand-100: 76 29 149;
+  --brand-200: 91 33 182;
+  --brand-300: 124 58 237;
+  --brand-400: 139 92 246;
+  --brand-500: 167 139 250;
+  --brand-600: 124 58 237;
+  --brand-700: 196 181 253;
+  --brand-800: 221 214 254;
+  --brand-900: 237 233 254;
 
-  --signal: 45 212 191;
-  --signal-strong: 94 234 212;
+  --signal: 34 211 238;
+  --signal-strong: 103 232 249;
+  --flux: 232 121 249;
 
   --money-soft: 15 51 36;
   --money: 52 211 153;
@@ -295,14 +297,14 @@ body {
 
 /* Flagship convergence node */
 .tiq-node i {
-  position: absolute; left: 0; top: 0; border-radius: 50%; background: #2dd4bf;
+  position: absolute; left: 0; top: 0; border-radius: 50%; background: #22d3ee;
 }
 .tiq-node i:nth-of-type(1) {
   width: 14px; height: 14px; margin: -7px 0 0 -7px;
   animation: tiq-ping 1.9s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 .tiq-node i:nth-of-type(2) {
-  width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; box-shadow: 0 0 12px 2px #2dd4bf;
+  width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; box-shadow: 0 0 12px 2px #22d3ee;
 }
 .tiq-node b {
   position: absolute; left: 11px; top: -7px; white-space: nowrap;
@@ -327,6 +329,11 @@ body {
   font-size: 12px; line-height: 1.4;
 }
 .leaflet-tooltip.tiq-tip::before { display: none; }
+.leaflet-tooltip.tiq-lab {
+  background: transparent; border: none; box-shadow: none; padding: 0;
+  color: #d7defc; font-size: 10px; font-weight: 500;
+  text-shadow: 0 1px 3px #000, 0 0 6px #000;
+}
 
 /* Soft entrance for live sections */
 .tiq-rise { animation: tiq-rise 0.5s ease both; }
