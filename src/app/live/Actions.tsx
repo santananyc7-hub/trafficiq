@@ -75,14 +75,17 @@ export default function Actions(d: Props) {
   ].sort((a, b) => b.proj - a.proj);
 
   return (
-    <section className="mt-8">
-      <h2 className="mb-1 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Launch a play</h2>
+    <section className="mt-8 rounded-2xl border p-5" style={{ background: "rgb(var(--surface))", borderColor: "rgb(var(--brand-600))" }}>
+      <div className="mb-3 flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full" style={{ background: "rgb(var(--signal))" }} />
+        <h2 className="text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--brand-600))" }}>Launch a play — the engine</h2>
+      </div>
       <p className="mb-3 text-[12px]" style={{ color: "rgb(var(--ink-muted))" }}>
-        Executable campaigns built from your data — copy the message, export the target, run it in Alpine IQ / Dutchie. No customer records leave here.
+        Three campaigns, built from your data and ranked by projected revenue. Copy the message, export the target list, run it in Alpine IQ / Dutchie — today. No customer records leave here.
       </p>
       <div className="grid gap-3 md:grid-cols-3">
         {plays.map((p) => (
-          <div key={p.id} className="flex flex-col rounded-xl border p-4" style={{ background: "rgb(var(--surface))", borderColor: "rgb(var(--border))" }}>
+          <div key={p.id} className="flex flex-col rounded-xl border p-4" style={{ background: "rgb(var(--surface-2))", borderColor: "rgb(var(--border))" }}>
             <div className="flex items-center justify-between">
               <span className="rounded-full px-2 py-0.5 text-[11px] font-semibold" style={{ background: "rgb(var(--brand-50))", color: "rgb(var(--brand-600))" }}>{p.tag}</span>
               <span className="text-[15px] font-semibold tabular" style={{ color: "rgb(var(--signal))" }}>{usd(p.proj)}<span className="text-[11px]" style={{ color: "rgb(var(--ink-subtle))" }}>/yr</span></span>

@@ -322,15 +322,8 @@ body {
 /* Competitor mark */
 .tiq-x { color: rgba(255,255,255,0.6); font: 700 13px var(--font-sans); text-shadow: 0 1px 2px #000; text-align: center; }
 
-/* Quantum particle-stream flows — small round dashes drifting toward Torches,
-   with a soft neon glow in the line's own color. */
-.tiq-signal {
-  stroke-dasharray: 2 12;
-  stroke-linecap: round;
-  animation: tiq-flow 1.15s linear infinite;
-  filter: drop-shadow(0 0 2.5px currentColor);
-}
-@keyframes tiq-flow { to { stroke-dashoffset: -14; } }
+/* The quantum flow itself is a canvas particle system (see CaptureMap.tsx);
+   only the faint arc rails are SVG polylines, styled inline. */
 
 /* Dark tooltip */
 .leaflet-tooltip.tiq-tip {

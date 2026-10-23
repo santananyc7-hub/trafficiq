@@ -55,9 +55,9 @@ export default async function LivePage() {
           Live Dutchie data · {topChannel[0]} {pct(topChannel[1] / chanTotal)} of orders{d.updatedAt ? ` · refreshed ${new Date(d.updatedAt).toLocaleDateString()}` : ""}
         </span>
       </header>
-      <h1 className="text-2xl font-semibold" style={{ color: "rgb(var(--ink))" }}>Torches — Command Center</h1>
-      <p className="mt-1 text-sm" style={{ color: "rgb(var(--ink-muted))" }}>
-        Where your next customers come from — and the one move that drives the most traffic this week.
+      <h1 className="text-[28px] font-semibold tracking-brand" style={{ color: "rgb(var(--ink))" }}>Torches — Customer Acquisition Engine</h1>
+      <p className="mt-1 max-w-2xl text-sm" style={{ color: "rgb(var(--ink-muted))" }}>
+        A live machine on your real Dutchie sales: it maps where every customer comes from, finds the neighborhoods you&apos;re missing, and turns both into campaigns you can launch today.
       </p>
 
       <section className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -66,6 +66,16 @@ export default async function LivePage() {
         <Kpi label="Value / customer" value={usd(d.realLTV)} sub="actual annual spend" />
         <Kpi label="Visit value" value={usd(visitValue)} sub="per transaction" />
       </section>
+
+      <section className="mt-8">
+        <h2 className="mb-1 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Where your customers come from</h2>
+        <p className="mb-2 text-[12px]" style={{ color: "rgb(var(--ink-muted))" }}>
+          Every stream is live customer flow from a home ZIP into Torches — brighter &amp; faster = more customers · labels show ZIP · count · ✕ = competitor
+        </p>
+        <CaptureMap rows={d.rows} origins={origins} />
+      </section>
+
+      <Actions active={d.active} repeatRate={d.repeatRate} realLTV={d.realLTV} avgTxns={d.avgTxns} segments={d.segments} rows={d.rows} />
 
       <section className="mt-8">
         <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>This week&apos;s moves</h2>
@@ -91,8 +101,6 @@ export default async function LivePage() {
           Real: active, repeat rate, LTV, penetration, channel. Modeled: capture conversion (5%) and reactivation win-back rates.
         </p>
       </section>
-
-      <Actions active={d.active} repeatRate={d.repeatRate} realLTV={d.realLTV} avgTxns={d.avgTxns} segments={d.segments} rows={d.rows} />
 
       <section className="mt-8">
         <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Channels — where orders come from</h2>
@@ -129,14 +137,6 @@ export default async function LivePage() {
           </div>
         </section>
       )}
-
-      <section className="mt-8">
-        <h2 className="mb-1 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Capture map</h2>
-        <p className="mb-2 text-[12px]" style={{ color: "rgb(var(--ink-muted))" }}>
-          Each stream is customer flow from a home ZIP into Torches — brighter &amp; thicker = more customers · labels show ZIP · count · ✕ = competitor
-        </p>
-        <CaptureMap rows={d.rows} origins={origins} />
-      </section>
     </main>
   );
 }
