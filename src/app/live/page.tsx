@@ -1,6 +1,6 @@
 import { getSnapshot } from "@/server/snapshot";
 import CaptureMap from "./CaptureMap";
-import Actions from "./Actions";
+import CaptureIndex from "./CaptureIndex";
 import origins from "../../../data/geo/zip-origins.json";
 
 /* Command Center — the real product. Server component: reads the latest
@@ -70,15 +70,15 @@ export default async function LivePage() {
       <section className="mt-8">
         <h2 className="mb-1 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Where your customers come from</h2>
         <p className="mb-2 text-[12px]" style={{ color: "rgb(var(--ink-muted))" }}>
-          Every stream is live customer flow from a home ZIP into Torches — brighter &amp; faster = more customers · labels show ZIP · count · ✕ = competitor
+          Each diamond is a home ZIP where your customers live; the streams are those customers flowing into Torches — denser &amp; brighter = more customers · chips show ZIP + count · ✕ = competitor
         </p>
         <CaptureMap rows={d.rows} origins={origins} />
       </section>
 
-      <Actions active={d.active} repeatRate={d.repeatRate} realLTV={d.realLTV} avgTxns={d.avgTxns} segments={d.segments} rows={d.rows} />
+      <CaptureIndex active={d.active} repeatRate={d.repeatRate} realLTV={d.realLTV} avgTxns={d.avgTxns} segments={d.segments} rows={d.rows} />
 
       <section className="mt-8">
-        <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>This week&apos;s moves</h2>
+        <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Grow the base you already have</h2>
         <div className="space-y-3">
           {moves.map((m) => (
             <div key={m.title} className="rounded-xl border p-4" style={{ background: "rgb(var(--surface))", borderColor: "rgb(var(--border))" }}>
