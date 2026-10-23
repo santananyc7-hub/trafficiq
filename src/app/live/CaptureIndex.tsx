@@ -11,6 +11,7 @@ interface Row { zip: string; name: string; status: string; activeY: number; annu
 interface Props {
   active: number; repeatRate: number; realLTV: number; avgTxns: number;
   segments?: { oneAndDone: number; dormant: number; vip: number; newCustomers: number; totalCustomers: number; loyaltyMembers: number };
+  vipProfile?: { age: number; income: number; ageWidth: number; basedOnVips: number; zipsProfiled: number; coverage: number };
   rows: Row[];
 }
 
@@ -50,9 +51,17 @@ export default function CaptureIndex(d: Props) {
         <span className="h-2 w-2 rounded-full" style={{ background: "rgb(var(--signal))" }} />
         <h2 className="text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--brand-600))" }}>The engine · Capture Index</h2>
       </div>
-      <p className="mb-4 max-w-3xl text-[12.5px] leading-relaxed" style={{ color: "rgb(var(--ink-muted))" }}>
+      <p className="mb-3 max-w-3xl text-[12.5px] leading-relaxed" style={{ color: "rgb(var(--ink-muted))" }}>
         Every neighborhood scored on one number — where your next customers are. It fuses your real customer home-ZIPs with the matching population there and how close competitors sit, then ranks by the revenue you&apos;re leaving on the table. Your POS and loyalty tools can&apos;t build this: they only see who already walked in.
       </p>
+      {d.vipProfile && (
+        <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg px-3 py-2 text-[12px]" style={{ background: "rgb(var(--brand-50))" }}>
+          <span className="font-semibold" style={{ color: "rgb(var(--brand-600))" }}>Scored against your real VIP profile</span>
+          <span style={{ color: "rgb(var(--ink-muted))" }}>
+            {d.vipProfile.basedOnVips.toLocaleString()} top-spenders cluster at age <b style={{ color: "rgb(var(--ink))" }}>~{Math.round(d.vipProfile.age)}</b> · household income <b style={{ color: "rgb(var(--ink))" }}>~${Math.round(d.vipProfile.income / 1000)}k</b> <span style={{ color: "rgb(var(--ink-subtle))" }}>(US Census, by their home ZIPs)</span>
+          </span>
+        </div>
+      )}
 
       <div className="mb-4 grid grid-cols-3 gap-3">
         <div className="rounded-xl p-3" style={{ background: "rgb(var(--surface-2))" }}>

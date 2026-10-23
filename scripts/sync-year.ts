@@ -21,6 +21,23 @@ function months() {
 const getJson = async (u: string) => { const r = await fetch(u, { headers: H }); if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); };
 const arrOf = (j: any) => (Array.isArray(j) ? j : (j.data ?? j.transactions ?? j.customers ?? []));
 
+// US Census ACS 5-year: population, median household income, median age per ZCTA.
+// Free government API (no key required; optional key just lifts rate limits).
+const CENSUS_CACHE = "data/geo/zip-census.json";
+async function censusDemo(zip: string): Promise<{ age: number; income: number; pop: number } | null> {
+  const ck = process.env.CENSUS_API_KEY?.trim(); const kp = ck ? `&key=${ck}` : "";
+  for (const yr of [2023, 2022]) {
+    try {
+      const res = await fetch(`https://api.census.gov/data/${yr}/acs/acs5?get=B01003_001E,B19013_001E,B01002_001E&for=zip%20code%20tabulation%20area:${zip}${kp}`);
+      if (!res.ok) continue;
+      const j = (await res.json()) as string[][]; const row = j[1]; if (!row) continue;
+      const [pop, income, age] = row.map(Number);
+      return { pop, income: income < 0 ? NaN : income, age: age < 0 ? NaN : age };
+    } catch { /* next vintage */ }
+  }
+  return null;
+}
+
 async function main() {
   process.stdout.write("customers → ZIP … ");
   const daysAgo = (s?: string) => (s ? (NOW.getTime() - new Date(s).getTime()) / 86400000 : Infinity);
@@ -74,20 +91,48 @@ async function main() {
     zActive[z] = (zActive[z] ?? 0) + 1; zSpend[z] = (zSpend[z] ?? 0) + sp;
     if ((last.get(cid) ?? 0) >= D90.getTime()) zActive90[z] = (zActive90[z] ?? 0) + 1;
   }
+  // ── Real VIP demographic profile: ground `match` in who actually spends ──
+  // Your top-10%-by-spend customers' home ZIPs → their Census age + income,
+  // weighted by how many VIPs live there. This is the profile every candidate
+  // neighborhood is scored against — no hard-coded assumptions.
+  process.stdout.write("VIP profile (Census) … ");
+  const spendThreshold = spendsDesc[vip - 1] ?? 0;
+  const vipByZip: Record<string, number> = {};
+  for (const [cid, sp] of spend) { if (sp < spendThreshold) continue; const z = cidZip.get(cid); if (z) vipByZip[z] = (vipByZip[z] ?? 0) + 1; }
+  const vipZips = Object.entries(vipByZip).sort((a, b) => b[1] - a[1]);
+  const vipPlaced = vipZips.reduce((s, [, n]) => s + n, 0) || 1;
+  const cache: Record<string, { age: number; income: number; pop: number }> = (() => { try { return JSON.parse(readFileSync(CENSUS_CACHE, "utf8")); } catch { return {}; } })();
+  const profileZips = vipZips.slice(0, 70);
+  for (const [z] of profileZips) { if (!cache[z]) { const c = await censusDemo(z); if (c) cache[z] = c; } }
+  try { writeFileSync(CENSUS_CACHE, JSON.stringify(cache)); } catch { /* cache is best-effort */ }
+  let wSum = 0, ageSum = 0, incSum = 0, covered = 0, used = 0; const agePts: [number, number][] = [];
+  for (const [z, n] of profileZips) { const c = cache[z]; if (!c || !Number.isFinite(c.age) || !Number.isFinite(c.income)) continue; wSum += n; ageSum += n * c.age; incSum += n * c.income; covered += n; used++; agePts.push([c.age, n]); }
+  const vipAge = wSum ? ageSum / wSum : 34;
+  const vipIncome = wSum ? incSum / wSum : 95000;
+  let varSum = 0; for (const [a, n] of agePts) varSum += n * (a - vipAge) ** 2;
+  const ageWidth = Math.max(6, wSum ? Math.sqrt(varSum / wSum) : 10);
+  const vipProfile = { age: Math.round(vipAge * 10) / 10, income: Math.round(vipIncome), ageWidth: Math.round(ageWidth * 10) / 10, basedOnVips: covered, zipsProfiled: used, coverage: covered / vipPlaced };
+  console.log(`age ~${vipProfile.age}, income ~$${vipProfile.income.toLocaleString()} (from ${covered.toLocaleString()} VIPs across ${used} ZIPs)`);
+
   const custByZip = new Map((JSON.parse(readFileSync("data/out/customers_by_zip.json", "utf8")) as any[]).map((r) => [r.zip, r.customers]));
   const geo = JSON.parse(readFileSync("data/out/opportunity.json", "utf8")) as any[];
   const CEILING = 0.2, CAPTURE = 0.05;
+  const clamp = (x: number, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, x));
   const rows = geo.map((g) => {
-    const demand = g.pop * g.match, activeY = zActive[g.zip] ?? 0;
+    // match = demographic similarity of this ZIP to the real VIP profile
+    const ageFit = Number.isFinite(g.age) ? Math.exp(-(((g.age - vipAge) / ageWidth) ** 2)) : 0.5;
+    const incomeFit = Number.isFinite(g.income) ? clamp(g.income / vipIncome) : 0.5;
+    const match = clamp(0.6 * ageFit + 0.4 * incomeFit, 0.001, 1);
+    const demand = g.pop * match, activeY = zActive[g.zip] ?? 0;
     const totalCust = (custByZip.get(g.zip) as number) ?? 0, dormant = Math.max(0, totalCust - activeY);
     const penetration = Math.min(1, activeY / (demand || 1));
     const reactivate$ = Math.round(dormant * repeatRate * realLTV);
     const capture$ = Math.round(Math.max(0, demand * CEILING - activeY) * CAPTURE * realLTV);
-    return { zip: g.zip, name: g.name, lat: g.lat, lng: g.lng, pop: g.pop, match: g.match, status: g.status,
+    return { zip: g.zip, name: g.name, lat: g.lat, lng: g.lng, pop: g.pop, match, status: g.status,
       activeY, dormant, penetration, reactivate$, capture$, annual: reactivate$ + capture$ };
   }).sort((a, b) => b.annual - a.annual);
 
-  const payload = { active, repeatRate, realLTV, avgTxns, channel, segments, rows };
+  const payload = { active, repeatRate, realLTV, avgTxns, channel, segments, vipProfile, rows };
   writeFileSync("data/out/opportunity_year.json", JSON.stringify(payload, null, 2));
   if (process.env.DATABASE_URL) {
     const { writeSnapshot } = await import("../src/server/snapshot");

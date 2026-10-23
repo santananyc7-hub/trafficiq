@@ -1,6 +1,7 @@
 import { getSnapshot } from "@/server/snapshot";
 import CaptureMap from "./CaptureMap";
 import CaptureIndex from "./CaptureIndex";
+import SpendPlan from "./SpendPlan";
 import origins from "../../../data/geo/zip-origins.json";
 
 /* Command Center — the real product. Server component: reads the latest
@@ -75,7 +76,9 @@ export default async function LivePage() {
         <CaptureMap rows={d.rows} origins={origins} />
       </section>
 
-      <CaptureIndex active={d.active} repeatRate={d.repeatRate} realLTV={d.realLTV} avgTxns={d.avgTxns} segments={d.segments} rows={d.rows} />
+      <CaptureIndex active={d.active} repeatRate={d.repeatRate} realLTV={d.realLTV} avgTxns={d.avgTxns} segments={d.segments} vipProfile={d.vipProfile} rows={d.rows} />
+
+      <SpendPlan rows={d.rows} realLTV={d.realLTV} />
 
       <section className="mt-8">
         <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Grow the base you already have</h2>
