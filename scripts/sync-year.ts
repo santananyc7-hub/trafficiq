@@ -23,10 +23,14 @@ const arrOf = (j: any) => (Array.isArray(j) ? j : (j.data ?? j.transactions ?? j
 
 async function main() {
   process.stdout.write("customers → ZIP … ");
+  const daysAgo = (s?: string) => (s ? (NOW.getTime() - new Date(s).getTime()) / 86400000 : Infinity);
   const cidZip = new Map<string, string>();
+  let newCustomers = 0, loyaltyMembers = 0;
   for (const c of arrOf(await getJson(`${base}/reporting/customers`))) {
     const z = String(c.postalCode ?? "").trim().slice(0, 5);
     if (/^\d{5}$/.test(z) && c.customerId != null) cidZip.set(String(c.customerId), z);
+    if (daysAgo(c.creationDate) <= 90) newCustomers++;
+    if (c.isLoyaltyMember) loyaltyMembers++;
   }
   console.log(`${cidZip.size.toLocaleString()}`);
 
@@ -47,11 +51,21 @@ async function main() {
   console.log(` ${total.toLocaleString()} txns`);
 
   const active = spend.size;
-  const repeat = [...txns.values()].filter((n) => n > 1).length;
+  const txnCounts = [...txns.values()];
+  const repeat = txnCounts.filter((n) => n > 1).length;
+  const oneAndDone = txnCounts.filter((n) => n === 1).length;
   const repeatRate = repeat / active;
   const totalSpend = [...spend.values()].reduce((a, b) => a + b, 0);
   const realLTV = Math.round(totalSpend / active);
   const avgTxns = total / active;
+
+  // Real customer segments (counts only — no PII).
+  const totalCustomers = cidZip.size;
+  const dormant = Math.max(0, totalCustomers - active);
+  const spendsDesc = [...spend.values()].sort((a, b) => b - a);
+  const vip = Math.max(1, Math.round(active * 0.1));
+  const vipRevenueShare = totalSpend ? spendsDesc.slice(0, vip).reduce((a, b) => a + b, 0) / totalSpend : 0;
+  const segments = { totalCustomers, active, newCustomers, repeat, oneAndDone, dormant, vip, vipRevenueShare, loyaltyMembers };
 
   // ZIP rollup
   const zActive: Record<string, number> = {}, zSpend: Record<string, number> = {}, zActive90: Record<string, number> = {};
@@ -73,7 +87,7 @@ async function main() {
       activeY, dormant, penetration, reactivate$, capture$, annual: reactivate$ + capture$ };
   }).sort((a, b) => b.annual - a.annual);
 
-  const payload = { active, repeatRate, realLTV, avgTxns, channel, rows };
+  const payload = { active, repeatRate, realLTV, avgTxns, channel, segments, rows };
   writeFileSync("data/out/opportunity_year.json", JSON.stringify(payload, null, 2));
   if (process.env.DATABASE_URL) {
     const { writeSnapshot } = await import("../src/server/snapshot");

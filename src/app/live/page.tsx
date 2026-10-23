@@ -135,6 +135,42 @@ export default async function LivePage() {
       </section>
 
       <section className="mt-8">
+        <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Channels — where orders come from</h2>
+        <div className="rounded-xl border p-4" style={{ background: "rgb(var(--surface))", borderColor: "rgb(var(--border))" }}>
+          {Object.entries(d.channel).sort((a, b) => b[1] - a[1]).map(([name, count]) => {
+            const p = count / chanTotal;
+            return (
+              <div key={name} className="mb-3 last:mb-0">
+                <div className="flex items-baseline justify-between text-[13px]">
+                  <span style={{ color: "rgb(var(--ink))" }}>{name}</span>
+                  <span className="tabular" style={{ color: "rgb(var(--ink-muted))" }}>{pct(p)}</span>
+                </div>
+                <div className="mt-1 h-1.5 w-full rounded-full" style={{ background: "rgb(var(--surface-3))" }}>
+                  <div className="h-1.5 rounded-full" style={{ width: `${Math.max(2, p * 100)}%`, background: "rgb(var(--brand-600))" }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {d.segments && (
+        <section className="mt-8">
+          <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Customer mix</h2>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <Kpi label="Total customers" value={d.segments.totalCustomers.toLocaleString()} sub="on file (with ZIP)" />
+            <Kpi label="Active (1 yr)" value={d.segments.active.toLocaleString()} />
+            <Kpi label="New (90 days)" value={d.segments.newCustomers.toLocaleString()} />
+            <Kpi label="Repeat" value={d.segments.repeat.toLocaleString()} sub={`${pct(d.segments.repeat / (d.segments.active || 1))} of active`} />
+            <Kpi label="One-and-done" value={d.segments.oneAndDone.toLocaleString()} sub="single visit" />
+            <Kpi label="Dormant" value={d.segments.dormant.toLocaleString()} sub="no purchase in 1 yr" />
+            <Kpi label="VIP (top 10%)" value={d.segments.vip.toLocaleString()} sub={`${pct(d.segments.vipRevenueShare)} of revenue`} />
+            <Kpi label="Loyalty members" value={d.segments.loyaltyMembers.toLocaleString()} />
+          </div>
+        </section>
+      )}
+
+      <section className="mt-8">
         <h2 className="mb-1 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Capture map</h2>
         <p className="mb-2 text-[12px]" style={{ color: "rgb(var(--ink-muted))" }}>
           Number = active customers today · bubble = $/yr opportunity · blue = your turf, orange = competitor-held · ✕ = competitor

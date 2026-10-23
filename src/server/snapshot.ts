@@ -13,6 +13,10 @@ export interface Snapshot {
   realLTV: number;
   avgTxns: number;
   channel: Record<string, number>;
+  segments?: {
+    totalCustomers: number; active: number; newCustomers: number; repeat: number;
+    oneAndDone: number; dormant: number; vip: number; vipRevenueShare: number; loyaltyMembers: number;
+  };
   rows: Array<{
     zip: string; name: string; lat: number; lng: number; pop: number; match: number;
     status: string; activeY: number; dormant: number; penetration: number;

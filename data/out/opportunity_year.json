@@ -5,9 +5,20 @@
   "avgTxns": 1.8919299754006353,
   "channel": {
     "Dutchie": 152618,
-    "Walk In": 5341,
     "Weedmaps": 455,
+    "Walk In": 5341,
     "Leafly": 20
+  },
+  "segments": {
+    "totalCustomers": 118748,
+    "active": 83742,
+    "newCustomers": 30981,
+    "repeat": 12462,
+    "oneAndDone": 71280,
+    "dormant": 35006,
+    "vip": 8374,
+    "vipRevenueShare": 0.5784727901972831,
+    "loyaltyMembers": 2337
   },
   "rows": [
     {
