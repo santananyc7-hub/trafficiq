@@ -73,7 +73,13 @@ async function main() {
       activeY, dormant, penetration, reactivate$, capture$, annual: reactivate$ + capture$ };
   }).sort((a, b) => b.annual - a.annual);
 
-  writeFileSync("data/out/opportunity_year.json", JSON.stringify({ active, repeatRate, realLTV, avgTxns, channel, rows }, null, 2));
+  const payload = { active, repeatRate, realLTV, avgTxns, channel, rows };
+  writeFileSync("data/out/opportunity_year.json", JSON.stringify(payload, null, 2));
+  if (process.env.DATABASE_URL) {
+    const { writeSnapshot } = await import("../src/server/snapshot");
+    await writeSnapshot(payload);
+    console.log("→ snapshot written to Neon");
+  }
   const usd = (n: number) => "$" + Math.round(n).toLocaleString("en-US");
   console.log(`\nFIRM metrics (12 months):`);
   console.log(`  active customers (bought in last yr): ${active.toLocaleString()}`);

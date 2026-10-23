@@ -12,7 +12,9 @@ const repo = "trafficiq-app";
 const basePath = process.env.PAGES === "1" ? `/${repo}` : "";
 
 const nextConfig: NextConfig = {
-  output: "export", // emit a static `out/` folder
+  // Static export only for the public GitHub Pages demo (PAGES=1). On Vercel the
+  // app runs as a server so /live can read Neon and revalidate hourly.
+  output: process.env.PAGES === "1" ? "export" : undefined,
   reactStrictMode: true,
   poweredByHeader: false,
   images: { unoptimized: true }, // no server = no on-demand image optimization

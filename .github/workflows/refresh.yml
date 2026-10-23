@@ -1,0 +1,25 @@
+name: Weekly data refresh
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      DUTCHIE_API_KEY: ${{ secrets.DUTCHIE_API_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NODE_OPTIONS: --max-old-space-size=6144
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Pull customers → ZIP aggregates (dormant pools), then transactions →
+      # active/LTV/channel joined to ZIP; sync-year writes the snapshot to Neon.
+      - run: npx tsx scripts/sync-customers.ts
+      - run: npx tsx scripts/sync-year.ts

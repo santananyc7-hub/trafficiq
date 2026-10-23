@@ -1,57 +1,16 @@
-"use client";
+import { getSnapshot, type Snapshot } from "@/server/snapshot";
 
-import data from "../../../data/out/opportunity_year.json";
+/* Command Center — the real product. Server component: reads the latest
+   aggregate snapshot from Neon (or the committed fallback). Revalidates hourly
+   so the weekly cron's fresh numbers appear without a redeploy. */
 
-/* Command Center — the real product. Reads live-Dutchie aggregates (ZIP-level,
-   no PII) and shows the three screens that matter: Pulse, Map, Moves. */
-
-type Row = {
-  zip: string; name: string; lat: number; lng: number; pop: number; match: number;
-  status: string; activeY: number; dormant: number; penetration: number;
-  ["reactivate$"]: number; ["capture$"]: number; annual: number;
-};
-const d = data as unknown as {
-  active: number; repeatRate: number; realLTV: number; avgTxns: number;
-  channel: Record<string, number>; rows: Row[];
-};
+export const revalidate = 3600;
 
 const usd = (n: number) => "$" + Math.round(n).toLocaleString("en-US");
 const usdK = (n: number) => "$" + Math.round(n / 1000) + "k";
 const pct = (n: number) => (n * 100).toFixed(1) + "%";
 
-const visitValue = d.realLTV / d.avgTxns;
-const chanTotal = Object.values(d.channel).reduce((a, b) => a + b, 0);
-const topChannel = Object.entries(d.channel).sort((a, b) => b[1] - a[1])[0] ?? (["Dutchie", 0] as [string, number]);
-const dormantSum = d.rows.reduce((s, r) => s + r.dormant, 0);
-const reactivateSum = d.rows.reduce((s, r) => s + r["reactivate$"], 0);
-const turf = (d.rows.filter((r) => r.status === "our turf").sort((a, b) => b["capture$"] - a["capture$"])[0] ?? d.rows[0])!;
-
-const moves = [
-  {
-    tag: "Frequency",
-    title: "Lift repeat rate — your biggest lever",
-    body: `${d.active.toLocaleString()} active customers visit just ${d.avgTxns.toFixed(1)}×/yr (repeat rate ${pct(d.repeatRate)}). A +5pt lift via your Dutchie menu + SMS ≈ one extra visit from ${Math.round(d.active * 0.05).toLocaleString()} customers.`,
-    value: Math.round(d.active * 0.05) * visitValue,
-    how: "Automated SMS/email reorder nudges to one-and-done customers through your owned channel (96% of orders already flow there).",
-  },
-  {
-    tag: "Reactivate",
-    title: "Win back the dormant base near you",
-    body: `${dormantSum.toLocaleString()} customers in your core catchment haven't bought in a year. Reactivating at your real ${pct(d.repeatRate)} repeat rate recovers lost revenue.`,
-    value: reactivateSum,
-    how: "Geo-targeted win-back offer to lapsed customers, by ZIP, fired from Alpine IQ.",
-  },
-  {
-    tag: "Capture",
-    title: `Own your doorstep — ${turf.name}`,
-    body: `${turf.name} (${turf.zip}) is your turf (you're closest) yet you have only ${turf.activeY} active customers in ${turf.pop.toLocaleString()} people — penetration ${pct(turf.penetration)}. Pure local upside.`,
-    value: turf["capture$"],
-    how: "Local referral + Google Business Profile radius push concentrated on this ZIP.",
-  },
-].sort((a, b) => b.value - a.value);
-
-function Map() {
-  const rows = d.rows;
+function Map({ rows }: { rows: Snapshot["rows"] }) {
   const comps = [
     { lat: 40.7544, lng: -73.9868 }, { lat: 40.7607, lng: -73.9837 }, { lat: 40.7589, lng: -73.9899 },
     { lat: 40.749, lng: -73.9888 }, { lat: 40.74, lng: -73.9905 },
@@ -63,7 +22,7 @@ function Map() {
   const W = 680, H = 440, pad = 56;
   const X = (g: number) => pad + ((g - lnMin) / (lnMax - lnMin)) * (W - 2 * pad);
   const Y = (g: number) => pad + ((laMax - g) / (laMax - laMin)) * (H - 2 * pad);
-  const maxv = Math.max(...rows.map((r) => r.annual));
+  const maxv = Math.max(...rows.map((r) => r.annual), 1);
   const R = (v: number) => 6 + Math.sqrt(v / maxv) * 20;
   const tx = X(T.lng), ty = Y(T.lat);
   const sorted = [...rows].sort((a, b) => b.annual - a.annual);
@@ -106,13 +65,36 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
   );
 }
 
-export default function LivePage() {
+export default async function LivePage() {
+  const d = await getSnapshot();
+  const visitValue = d.realLTV / (d.avgTxns || 1);
+  const chanTotal = Object.values(d.channel).reduce((a, b) => a + b, 0) || 1;
+  const topChannel = Object.entries(d.channel).sort((a, b) => b[1] - a[1])[0] ?? (["Dutchie", 0] as [string, number]);
+  const dormantSum = d.rows.reduce((s, r) => s + r.dormant, 0);
+  const reactivateSum = d.rows.reduce((s, r) => s + r["reactivate$"], 0);
+  const turf = (d.rows.filter((r) => r.status === "our turf").sort((a, b) => b["capture$"] - a["capture$"])[0] ?? d.rows[0])!;
+
+  const moves = [
+    { tag: "Frequency", title: "Lift repeat rate — your biggest lever",
+      body: `${d.active.toLocaleString()} active customers visit just ${d.avgTxns.toFixed(1)}×/yr (repeat rate ${pct(d.repeatRate)}). A +5pt lift via your Dutchie menu + SMS ≈ one extra visit from ${Math.round(d.active * 0.05).toLocaleString()} customers.`,
+      value: Math.round(d.active * 0.05) * visitValue,
+      how: "Automated SMS/email reorder nudges to one-and-done customers through your owned channel (96% of orders already flow there)." },
+    { tag: "Reactivate", title: "Win back the dormant base near you",
+      body: `${dormantSum.toLocaleString()} customers in your core catchment haven't bought in a year. Reactivating at your real ${pct(d.repeatRate)} repeat rate recovers lost revenue.`,
+      value: reactivateSum,
+      how: "Geo-targeted win-back offer to lapsed customers, by ZIP, fired from Alpine IQ." },
+    { tag: "Capture", title: `Own your doorstep — ${turf.name}`,
+      body: `${turf.name} (${turf.zip}) is your turf (you're closest) yet you have only ${turf.activeY} active customers in ${turf.pop.toLocaleString()} people — penetration ${pct(turf.penetration)}. Pure local upside.`,
+      value: turf["capture$"],
+      how: "Local referral + Google Business Profile radius push concentrated on this ZIP." },
+  ].sort((a, b) => b.value - a.value);
+
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-5 py-10" style={{ background: "rgb(var(--canvas))" }}>
       <header className="mb-1 flex items-center gap-2">
         <span className="h-2 w-2 rounded-full" style={{ background: "rgb(var(--signal))" }} />
         <span className="text-[12px] font-semibold uppercase tracking-[0.18em]" style={{ color: "rgb(var(--ink-subtle))" }}>
-          Live Dutchie data · {topChannel[0]} {pct(topChannel[1] / chanTotal)} of orders
+          Live Dutchie data · {topChannel[0]} {pct(topChannel[1] / chanTotal)} of orders{d.updatedAt ? ` · refreshed ${new Date(d.updatedAt).toLocaleDateString()}` : ""}
         </span>
       </header>
       <h1 className="text-2xl font-semibold" style={{ color: "rgb(var(--ink))" }}>Torches — Command Center</h1>
@@ -158,7 +140,7 @@ export default function LivePage() {
           Number = active customers today · bubble = $/yr opportunity · blue = your turf, orange = competitor-held · ✕ = competitor
         </p>
         <div className="rounded-xl border p-3" style={{ background: "rgb(var(--surface))", borderColor: "rgb(var(--border))" }}>
-          <Map />
+          <Map rows={d.rows} />
         </div>
       </section>
     </main>
