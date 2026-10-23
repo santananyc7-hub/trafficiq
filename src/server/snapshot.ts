@@ -23,9 +23,14 @@ export interface Snapshot {
 
 const CREATE = "CREATE TABLE IF NOT EXISTS command_snapshot (id text PRIMARY KEY, data jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())";
 
+// The Vercel Neon integration may expose the pooled URL under any of these.
+function dbUrl(): string | undefined {
+  return (process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.DATABASE_URL_UNPOOLED)?.trim() || undefined;
+}
+
 export async function writeSnapshot(payload: Omit<Snapshot, "updatedAt">): Promise<void> {
-  const url = process.env.DATABASE_URL?.trim();
-  if (!url) throw new Error("DATABASE_URL not set");
+  const url = dbUrl();
+  if (!url) throw new Error("No database URL set");
   const sql = neon(url);
   await sql.query(CREATE);
   await sql`INSERT INTO command_snapshot (id, data, updated_at)
@@ -34,7 +39,7 @@ export async function writeSnapshot(payload: Omit<Snapshot, "updatedAt">): Promi
 }
 
 export async function getSnapshot(): Promise<Snapshot> {
-  const url = process.env.DATABASE_URL?.trim();
+  const url = dbUrl();
   if (url) {
     try {
       const sql = neon(url);
