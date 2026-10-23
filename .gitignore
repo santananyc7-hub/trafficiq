@@ -31,3 +31,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# real business aggregates — never commit/deploy publicly
+data/out/

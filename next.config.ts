@@ -6,9 +6,10 @@ import type { NextConfig } from "next";
  * production every asset/route must be prefixed with `/<repo>`. Locally (dev +
  * `next start`) basePath is empty so nothing changes for day-to-day work.
  */
+// basePath only for the public GitHub Pages demo build (PAGES=1). The private
+// Vercel app serves at root, so basePath stays empty there.
 const repo = "trafficiq-app";
-const isProd = process.env.NODE_ENV === "production";
-const basePath = isProd ? `/${repo}` : "";
+const basePath = process.env.PAGES === "1" ? `/${repo}` : "";
 
 const nextConfig: NextConfig = {
   output: "export", // emit a static `out/` folder
