@@ -133,7 +133,7 @@ export default async function LivePage() {
       <section className="mt-8">
         <h2 className="mb-1 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Capture map</h2>
         <p className="mb-2 text-[12px]" style={{ color: "rgb(var(--ink-muted))" }}>
-          Heat = where your customers come from · circles = $/yr opportunity (blue your turf, orange competitor-held) · pulsing node = Torches · lines = signals converging
+          Each stream is customer flow from a home ZIP into Torches — brighter &amp; thicker = more customers · labels show ZIP · count · ✕ = competitor
         </p>
         <CaptureMap rows={d.rows} origins={origins} />
       </section>

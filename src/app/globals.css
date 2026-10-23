@@ -315,11 +315,21 @@ body {
   100% { transform: scale(3.4); opacity: 0; }
 }
 
+.tiq-node.tiq-node-lg i:nth-of-type(1) { width: 20px; height: 20px; margin: -10px 0 0 -10px; }
+.tiq-node.tiq-node-lg i:nth-of-type(2) { width: 12px; height: 12px; margin: -6px 0 0 -6px; box-shadow: 0 0 18px 4px #22d3ee; }
+.tiq-node.tiq-node-lg b { left: 14px; font-size: 12px; }
+
 /* Competitor mark */
 .tiq-x { color: rgba(255,255,255,0.6); font: 700 13px var(--font-sans); text-shadow: 0 1px 2px #000; text-align: center; }
 
-/* Flowing "signals converging" lines */
-.tiq-signal { stroke-dasharray: 5 9; animation: tiq-flow 1.3s linear infinite; }
+/* Quantum particle-stream flows — small round dashes drifting toward Torches,
+   with a soft neon glow in the line's own color. */
+.tiq-signal {
+  stroke-dasharray: 2 12;
+  stroke-linecap: round;
+  animation: tiq-flow 1.15s linear infinite;
+  filter: drop-shadow(0 0 2.5px currentColor);
+}
 @keyframes tiq-flow { to { stroke-dashoffset: -14; } }
 
 /* Dark tooltip */
