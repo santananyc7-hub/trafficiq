@@ -284,3 +284,50 @@ body {
   0%, 100% { transform: scale(1.03); }
   50% { transform: scale(1.09); }
 }
+
+/* ── Capture map (Leaflet) — quantum signal motion ───────────────────────── */
+.tiq-map { position: relative; }
+.tiq-map .leaflet-container { background: #0a0e18; font-family: var(--font-sans); }
+.tiq-map .leaflet-control-zoom a {
+  background: #12172a; color: #c7cede; border-color: #2a3350;
+}
+.tiq-map .leaflet-control-zoom a:hover { background: #1b2238; }
+
+/* Flagship convergence node */
+.tiq-node i {
+  position: absolute; left: 0; top: 0; border-radius: 50%; background: #2dd4bf;
+}
+.tiq-node i:nth-of-type(1) {
+  width: 14px; height: 14px; margin: -7px 0 0 -7px;
+  animation: tiq-ping 1.9s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.tiq-node i:nth-of-type(2) {
+  width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; box-shadow: 0 0 12px 2px #2dd4bf;
+}
+.tiq-node b {
+  position: absolute; left: 11px; top: -7px; white-space: nowrap;
+  font-size: 11px; font-weight: 500; color: #eef1f8; text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+@keyframes tiq-ping {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(3.4); opacity: 0; }
+}
+
+/* Competitor mark */
+.tiq-x { color: rgba(255,255,255,0.6); font: 700 13px var(--font-sans); text-shadow: 0 1px 2px #000; text-align: center; }
+
+/* Flowing "signals converging" lines */
+.tiq-signal { stroke-dasharray: 5 9; animation: tiq-flow 1.3s linear infinite; }
+@keyframes tiq-flow { to { stroke-dashoffset: -14; } }
+
+/* Dark tooltip */
+.leaflet-tooltip.tiq-tip {
+  background: #12172a; color: #eef1f8; border: 1px solid #2a3350;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.55); border-radius: 8px; padding: 6px 9px;
+  font-size: 12px; line-height: 1.4;
+}
+.leaflet-tooltip.tiq-tip::before { display: none; }
+
+/* Soft entrance for live sections */
+.tiq-rise { animation: tiq-rise 0.5s ease both; }
+@keyframes tiq-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

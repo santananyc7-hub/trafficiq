@@ -1,4 +1,6 @@
-import { getSnapshot, type Snapshot } from "@/server/snapshot";
+import { getSnapshot } from "@/server/snapshot";
+import CaptureMap from "./CaptureMap";
+import origins from "../../../data/geo/zip-origins.json";
 
 /* Command Center — the real product. Server component: reads the latest
    aggregate snapshot from Neon (or the committed fallback). Revalidates hourly
@@ -9,51 +11,6 @@ export const revalidate = 3600;
 const usd = (n: number) => "$" + Math.round(n).toLocaleString("en-US");
 const usdK = (n: number) => "$" + Math.round(n / 1000) + "k";
 const pct = (n: number) => (n * 100).toFixed(1) + "%";
-
-function Map({ rows }: { rows: Snapshot["rows"] }) {
-  const comps = [
-    { lat: 40.7544, lng: -73.9868 }, { lat: 40.7607, lng: -73.9837 }, { lat: 40.7589, lng: -73.9899 },
-    { lat: 40.749, lng: -73.9888 }, { lat: 40.74, lng: -73.9905 },
-  ];
-  const T = { lat: 40.7527, lng: -73.979 };
-  const all = [...rows, ...comps, T];
-  const laMin = Math.min(...all.map((p) => p.lat)), laMax = Math.max(...all.map((p) => p.lat));
-  const lnMin = Math.min(...all.map((p) => p.lng)), lnMax = Math.max(...all.map((p) => p.lng));
-  const W = 680, H = 440, pad = 56;
-  const X = (g: number) => pad + ((g - lnMin) / (lnMax - lnMin)) * (W - 2 * pad);
-  const Y = (g: number) => pad + ((laMax - g) / (laMax - laMin)) * (H - 2 * pad);
-  const maxv = Math.max(...rows.map((r) => r.annual), 1);
-  const R = (v: number) => 6 + Math.sqrt(v / maxv) * 20;
-  const tx = X(T.lng), ty = Y(T.lat);
-  const sorted = [...rows].sort((a, b) => b.annual - a.annual);
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
-      {sorted.map((r, i) => {
-        const x = X(r.lng), y = Y(r.lat), rad = R(r.annual);
-        const col = r.status === "our turf" ? "#2563eb" : "#eb6834";
-        const right = x > 500;
-        return (
-          <g key={r.zip}>
-            <circle cx={x} cy={y} r={rad} fill={col} fillOpacity={0.2} stroke={col} strokeWidth={1} />
-            <text x={x} y={y + 4} textAnchor="middle" fontSize={11} fontWeight={500} fill={col}>{r.activeY}</text>
-            {i < 7 && (
-              <>
-                <text x={right ? x - rad - 5 : x + rad + 5} y={y - 2} textAnchor={right ? "end" : "start"} fontSize={11} fontWeight={500} fill="rgb(var(--ink))">{r.name.split(" / ")[0]}</text>
-                <text x={right ? x - rad - 5 : x + rad + 5} y={y + 10} textAnchor={right ? "end" : "start"} fontSize={10} fill="rgb(var(--ink-muted))">{usdK(r.annual)}/yr</text>
-              </>
-            )}
-          </g>
-        );
-      })}
-      {comps.map((c, i) => {
-        const x = X(c.lng), y = Y(c.lat);
-        return <path key={i} d={`M${x - 5} ${y - 5}L${x + 5} ${y + 5}M${x + 5} ${y - 5}L${x - 5} ${y + 5}`} stroke="rgb(var(--ink-subtle))" strokeWidth={2} strokeLinecap="round" />;
-      })}
-      <path d={`M${tx} ${ty - 9}L${tx + 9} ${ty}L${tx} ${ty + 9}L${tx - 9} ${ty}Z`} fill="#1d4ed8" stroke="#fff" strokeWidth={1.5} />
-      <text x={tx} y={ty + 23} textAnchor="middle" fontSize={11} fontWeight={500} fill="rgb(var(--ink))">Torches</text>
-    </svg>
-  );
-}
 
 function Kpi({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
@@ -173,11 +130,9 @@ export default async function LivePage() {
       <section className="mt-8">
         <h2 className="mb-1 text-[13px] font-semibold uppercase tracking-wide" style={{ color: "rgb(var(--ink-subtle))" }}>Capture map</h2>
         <p className="mb-2 text-[12px]" style={{ color: "rgb(var(--ink-muted))" }}>
-          Number = active customers today · bubble = $/yr opportunity · blue = your turf, orange = competitor-held · ✕ = competitor
+          Heat = where your customers come from · circles = $/yr opportunity (blue your turf, orange competitor-held) · pulsing node = Torches · lines = signals converging
         </p>
-        <div className="rounded-xl border p-3" style={{ background: "rgb(var(--surface))", borderColor: "rgb(var(--border))" }}>
-          <Map rows={d.rows} />
-        </div>
+        <CaptureMap rows={d.rows} origins={origins} />
       </section>
     </main>
   );
